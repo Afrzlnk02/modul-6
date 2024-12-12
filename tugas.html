@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Pemesanan</title>
+    <script src="jquery-3.7.1.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .form-group { margin-bottom: 10px; }
+        label { display: block; margin-bottom: 5px; }
+        input, select { width: 100%; padding: 8px; margin-bottom: 10px; }
+        button { padding: 10px 15px; margin-right: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Form Pemesanan</h1>
+    <div class="form-group">
+        <label for="nama">Nama Pemesan:</label>
+        <input type="text" id="nama" required>
+    </div>
+    <div class="form-group">
+        <label for="jenis-kelamin">Jenis Kelamin:</label>
+        <select id="jenis-kelamin">
+            <option value="Laki-laki">Laki-Laki</option>
+            <option value="Perempuan">Perempuan</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="nomor-identitas">Nomor Identitas:</label>
+        <input type="text" id="nomor-identitas" maxlength="16" required>
+    </div>
+    <div class="form-group">
+        <label for="tipe-kamar">Tipe Kamar:</label>
+        <select id="tipe-kamar">
+            <option value="Standar">Standar</option>
+            <option value="Deluxe">Deluxe</option>
+            <option value="Family">Family</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="harga">Harga:</label>
+        <input type="text" id="harga" readonly>
+    </div>
+    <div class="form-group">
+        <label for="tanggal-pesan">Tanggal Pesan:</label>
+        <input type="text" id="tanggal-pesan" placeholder="dd/mm/yyyy" required>
+    </div>
+    <div class="form-group">
+        <label for="durasi">Durasi Menginap (hari):</label>
+        <input type="number" id="durasi" required>
+    </div>
+    <div class="form-group">
+        <label><input type="checkbox" id="breakfast"> Termasuk Breakfast</label>
+    </div>
+    <div class="form-group">
+        <label for="total-bayar">Total Bayar:</label>
+        <input type="text" id="total-bayar" readonly>
+    </div>
+    <button id="simpan">Simpan</button>
+    <button id="batal">Batal</button>
+
+    <h2>Data Resume Pemesanan</h2>
+    <div id="resume"></div>
+
+    <script>
+        $(document).ready(function() {
+            const hargaKamar = {
+                "Standar": 500000,
+                "Deluxe": 800000,
+                "Family": 1200000
+            };
+
+            $("#tipe-kamar").change(function() {
+                const tipe = $(this).val();
+                const harga = hargaKamar[tipe];
+                $("#harga").val(harga);
+            });
+
+            $("#simpan").click(function() {
+                const nama = $("#nama").val();
+                const jenisKelamin = $("#jenis-kelamin").val();
+                const nomorIdentitas = $("#nomor-identitas").val();
+                const tipeKamar = $("#tipe-kamar").val();
+                const harga = parseFloat($("#harga").val());
+                const tanggalPesan = $("#tanggal-pesan").val();
+                const durasi = parseInt($("#durasi").val());
+                const breakfast = $("#breakfast").is(":checked");
+                const totalBayarElement = $("#total-bayar");
+
+                if (nomorIdentitas.length !== 16) {
+                    alert("Nomor identitas harus 16 digit.");
+                    return;
+                }
+
+                let totalBayar = harga * durasi;
+                let diskon = 0;
+
+                if (durasi > 3) {
+                    diskon = totalBayar * 0.10;
+                    totalBayar -= diskon;
+                }
+
+                if (breakfast) {
+                    totalBayar += 80000;
+                }
+
+                totalBayarElement.val(totalBayar);
+
+                const resume = `
+                    <p>Nama Pemesan: ${nama}</p>
+                    <p>Jenis Kelamin: ${jenisKelamin}</p>
+                    <p>Nomor Identitas: ${nomorIdentitas}</p>
+                    <p>Tipe Kamar: ${tipeKamar}</p>
+                    <p>Durasi Menginap: ${durasi} hari</p>
+                    <p>Diskon: ${diskon}</p>
+                    <p>Total Bayar: ${totalBayar}</p>
+                `;
+                $("#resume").html(resume);
+            });
+
+            $("#batal").click(function() {
+                $("#nama").val('');
+                $("#jenis-kelamin").val('');
+                $("#nomor-identitas").val('');
+                $("#tipe-kamar").val('');
+                $("#harga").val('');
+                $("#tanggal-pesan").val('');
+                $("#durasi").val('');
+                $("#breakfast").prop('checked', false);
+                $("#total-bayar").val('');
+                $("#resume").html('');
+            });
+        });
+    </script>
+</body>
+</html>
